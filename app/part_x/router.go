@@ -2,16 +2,31 @@ package part_x
 
 import (
 	"github.com/gin-gonic/gin"
+	"howego/model"
+	"howego/service"
 	"net/http"
 )
 
 func Routers(e *gin.Engine)  {
 	v1 := e.Group("/v1")
 	{
-		v1.GET("/test", test)
+		v1.POST("/sign", sign)
+		v1.GET("/user/:email", userInfo)
 	}
 }
 
-func test(c *gin.Context)  {
-	c.JSON(http.StatusOK, gin.H{"message": "hello world"})
+func sign(c *gin.Context)  {
+	us := service.NewUserService()
+	user := model.User{}
+	if err := c.ShouldBind(&user); err != nil{
+		c.JSON(http.StatusOK, "error param")
+		return
+	}
+	c.JSON(http.StatusOK, us.SignUp(user))
+}
+
+func userInfo(c *gin.Context)  {
+	us := service.NewUserService()
+	email := c.Param("email")
+	c.JSON(http.StatusOK, us.GetUserInfo(email))
 }

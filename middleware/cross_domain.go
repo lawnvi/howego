@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+//前端跨域问题
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
