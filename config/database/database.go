@@ -16,14 +16,14 @@ func Init() error {
 	//读取当前环境数据库配置
 	db, err := loadInfos()
 	if err != nil {
-		db = DBInfo{
+		db = dBInfo{
 			Name:     "howego_debug",
 			DbType:   "mysql",
 			Host:     "150.158.161.214",
 			Port:     "3306",
 			User:     "root",
 			Password: "3.14",
-			Config: DBConfig{
+			Config: dBConfig{
 				MaxIdle: 2,
 				MaxOpen: 4,
 			},
@@ -35,35 +35,35 @@ func Init() error {
 }
 
 //数据库连接信息
-type DBInfo struct {
+type dBInfo struct {
 	Name     string `yaml:"name"`
 	DbType   string `yaml:"type"`
 	Host     string `yaml:"host"`
 	Port     string `yaml:"port"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
-	Config   DBConfig
+	Config   dBConfig
 }
 
 //连接池配置
-type DBConfig struct {
+type dBConfig struct {
 	MaxIdle int `yaml:"max_idle"`
 	MaxOpen int `yaml:"max_open"`
 }
 
 //对应database.yml
-type DataBase struct {
-	Debug   DBInfo
-	Release DBInfo
+type dataBase struct {
+	Debug   dBInfo
+	Release dBInfo
 }
 
 //读取当前运行环境的数据库配置
-func loadInfos() (info DBInfo, err error) {
+func loadInfos() (info dBInfo, err error) {
 	fileData, err := ioutil.ReadFile("./config/database/database.yml")
 	if err != nil {
 		return
 	}
-	var infos = DataBase{}
+	var infos = dataBase{}
 	err = yaml.Unmarshal(fileData, &infos)
 	fmt.Println(infos)
 	mode := gin.Mode()
@@ -76,7 +76,8 @@ func loadInfos() (info DBInfo, err error) {
 }
 
 //连接数据库
-func (db *DBInfo) connect() (*gorm.DB, error) {
+func (db *dBInfo) connect() (*gorm.DB, error) {
+	fmt.Println(db.User+":"+db.Password+"@tcp("+db.Host+")/"+db.Name+"?charset=utf8&parseTime=True&loc=Local")
 	gormDB, err := gorm.Open(db.DbType, db.User+":"+db.Password+"@tcp("+db.Host+")/"+db.Name+"?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		fmt.Println(err)
