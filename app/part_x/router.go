@@ -2,8 +2,8 @@ package part_x
 
 import (
 	"github.com/gin-gonic/gin"
+	"howego/app/part_x/service"
 	"howego/model"
-	"howego/service"
 	"net/http"
 )
 
