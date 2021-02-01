@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -16,18 +15,7 @@ func Init() error {
 	//读取当前环境数据库配置
 	db, err := loadInfos()
 	if err != nil {
-		db = dBInfo{
-			Name:     "howego_debug",
-			DbType:   "mysql",
-			Host:     "150.158.161.214",
-			Port:     "3306",
-			User:     "root",
-			Password: "3.14",
-			Config: dBConfig{
-				MaxIdle: 2,
-				MaxOpen: 4,
-			},
-		}
+		return err
 	}
 	//获取数据库连接
 	DB, err = db.connect()
@@ -65,7 +53,6 @@ func loadInfos() (info dBInfo, err error) {
 	}
 	var infos = dataBase{}
 	err = yaml.Unmarshal(fileData, &infos)
-	fmt.Println(infos)
 	mode := gin.Mode()
 	if mode == gin.DebugMode || mode == gin.TestMode {
 		info = infos.Debug
@@ -77,10 +64,8 @@ func loadInfos() (info dBInfo, err error) {
 
 //连接数据库
 func (db *dBInfo) connect() (*gorm.DB, error) {
-	fmt.Println(db.User+":"+db.Password+"@tcp("+db.Host+")/"+db.Name+"?charset=utf8&parseTime=True&loc=Local")
 	gormDB, err := gorm.Open(db.DbType, db.User+":"+db.Password+"@tcp("+db.Host+")/"+db.Name+"?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	//全局禁用表复数
