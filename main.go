@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"howego/app/part_x"
+	"howego/app/part_x/controller"
 	"howego/config/database"
 	"howego/config/log"
 	"howego/config/routers"
@@ -21,7 +21,7 @@ func main() {
 	defer database.DB.Close()
 
 	//加载多个app的路由配置
-	routers.Include(part_x.Routers)
+	routers.Include(controller.UserRouters)
 	//初始化路由
 	r := routers.Init()
 	if err := r.Run(":8088"); err != nil {

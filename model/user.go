@@ -4,7 +4,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"howego/config/database"
 	"howego/config/log"
-	"strconv"
 )
 
 type User struct {
@@ -14,32 +13,28 @@ type User struct {
 	Field string `json:"field"`
 }
 
-type UserMapper interface {
-	Find(email string) User
-	Append(user *User)
-	Update(user *User)
-}
-
-type userDao struct {
+type UserDao struct {
 	db *gorm.DB
 }
 
-func NewUserMapper(db *gorm.DB) UserMapper {
+func NewUserDao(db *gorm.DB) UserDao {
 	database.HasTable(User{})
-	return &userDao{db: db}
+	return UserDao{
+		db:   db,
+	}
 }
 
-func (m *userDao) Append(user *User) {
-	m.db.Create(&user)
+func (m *UserDao) Append(user *User) {
+	m.db.Create(user)
 	log.I("db", "append user ok"+user.Name)
 }
 
-func (m *userDao) Find(email string) User {
+func (m *UserDao) FindByEmail(email string) User{
 	var user = User{}
 	m.db.Where("email= ?", email).Find(&user)
 	return user
 }
 
-func (m *userDao) Update(user *User) {
-	log.I("db", "update user ok "+strconv.Itoa(user.Id))
+func (m *UserDao) Update(user *User) {
+	m.db.Save(user)
 }

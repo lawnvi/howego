@@ -7,22 +7,18 @@ import (
 	"howego/model"
 )
 
-type UserService interface {
-	SignUp (user model.User) config.ResultMsg
-	GetUserInfo(email string) config.ResultMsg
-}
-
-type userImpl struct {
+type UserService struct {
+	userDao model.UserDao
 }
 
 func NewUserService() UserService {
-	return &userImpl{}
+	return UserService{userDao: model.NewUserDao(database.DB)}
 }
 
-func (u *userImpl) SignUp(user model.User) config.ResultMsg{
+func (u *UserService) SignUp(user model.User) config.ResultMsg{
 	msg := config.ResultMsg{}
-	um := model.NewUserMapper(database.DB)
-	if um.Find(user.Email).Id > 0{
+	um := model.NewUserDao(database.DB)
+	if um.FindByEmail(user.Email).Id > 0{
 		fmt.Printf("user %v is already exist", user)
 		msg.Data = "user is already exist"
 		msg.Code = 10
@@ -33,9 +29,15 @@ func (u *userImpl) SignUp(user model.User) config.ResultMsg{
 	return msg
 }
 
-func (u *userImpl) GetUserInfo(email string) config.ResultMsg{
-	um := model.NewUserMapper(database.DB)
+func (u *UserService) GetUserInfo(email string) config.ResultMsg{
+	um := model.NewUserDao(database.DB)
 	msg := config.ResultMsg{}
-	msg.Data = um.Find(email)
+	var user = um.FindByEmail(email)
+	if user == (model.User{}) {
+		msg.Code = 0001
+		msg.Msg = "not find this email:"+ email
+	}else {
+		msg.Data = user
+	}
 	return msg
 }

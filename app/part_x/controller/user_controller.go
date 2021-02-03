@@ -1,4 +1,4 @@
-package part_x
+package controller
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,16 @@ import (
 	"net/http"
 )
 
-func Routers(e *gin.Engine)  {
+type userController struct {
+	us service.UserService
+}
+
+var uc userController
+
+func UserRouters(e *gin.Engine)  {
+	uc = userController{
+		us: service.NewUserService(),
+	}
 	v1 := e.Group("/v1")
 	{
 		v1.POST("/sign", sign)
@@ -16,17 +25,15 @@ func Routers(e *gin.Engine)  {
 }
 
 func sign(c *gin.Context)  {
-	us := service.NewUserService()
 	user := model.User{}
 	if err := c.ShouldBind(&user); err != nil{
 		c.JSON(http.StatusOK, "error param")
 		return
 	}
-	c.JSON(http.StatusOK, us.SignUp(user))
+	c.JSON(http.StatusOK, uc.us.SignUp(user))
 }
 
 func userInfo(c *gin.Context)  {
-	us := service.NewUserService()
 	email := c.Param("email")
-	c.JSON(http.StatusOK, us.GetUserInfo(email))
+	c.JSON(http.StatusOK, uc.us.GetUserInfo(email))
 }
