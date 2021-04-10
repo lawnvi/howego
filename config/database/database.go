@@ -69,7 +69,7 @@ func (db *dBInfo) connect() (*gorm.DB, error) {
 		return nil, err
 	}
 	//全局禁用表复数
-	//DB.SingularTable(true)
+	gormDB.SingularTable(true)
 	gormDB.DB().SetMaxIdleConns(2)    //最大空闲连接数
 	gormDB.DB().SetMaxOpenConns(4)    //最大连接数
 	gormDB.DB().SetConnMaxLifetime(time.Second + 300) //设置连接空闲超时
